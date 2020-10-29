@@ -1,0 +1,29 @@
+{
+  "name": "brokerportal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackthequack/brokerPortal.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jackthequack/brokerPortal/issues"
+  },
+  "homepage": "https://github.com/jackthequack/brokerPortal#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "hbs": "^4.1.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^7.12.1",
+    "eslint-plugin-mocha": "^8.0.0",
+    "mocha": "^8.2.0"
+  }
+}
