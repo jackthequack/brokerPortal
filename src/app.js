@@ -23,6 +23,12 @@ use();
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/signin.html');
-})
+});
+
+app.get('/dashboard', (req, res)=>{
+    res.sendFile(__dirname + '/public/dashboard.html');
+});
+
+
 
 app.listen(3000)
