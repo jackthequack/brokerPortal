@@ -1,5 +1,8 @@
 const express = require('express');
 const db = require('./db.js');
+const mongoose = require('mongoose');
+const Broker = mongoose.model('Broker');
+const Realtor = mongoose.model('Realtor');
 
 const app = express();
 
@@ -12,14 +15,14 @@ const logger = (req, res, next) => {
 
 const use = () => {
     app.use(express.static('public'));
-    app.set('view engine', 'hbs');
-    app.use(express.urlencoded({extended: false}));    
+    //app.set('view engine', 'hbs');
+    app.use(express.urlencoded({extended: false}));
     app.use(logger)
 }
 use();
 
 app.get('/', (req, res) => {
-    res.render('home')
+    res.sendFile(__dirname + '/public/signin.html');
 })
 
 app.listen(3000)

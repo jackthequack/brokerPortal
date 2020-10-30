@@ -18,7 +18,8 @@
   "homepage": "https://github.com/jackthequack/brokerPortal#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "hbs": "^4.1.1"
+    "hbs": "^4.1.1",
+    "mongoose": "^5.10.11"
   },
   "devDependencies": {
     "chai": "^4.2.0",
