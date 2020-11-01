@@ -73,7 +73,7 @@ body {
  */
 
 .navbar-brand {
-  padding-top: .75rem;
+  padding-top: .5rem;
   padding-bottom: .75rem;
   font-size: 1rem;
   background-color: rgba(0, 0, 0, .25);
@@ -100,4 +100,13 @@ body {
 .form-control-dark:focus {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
+}
+.nav-item{
+  padding: .75rem;
+  border-bottom: 1px solid black;
+}
+
+.navbar-brand.col-md-3.col-lg-2.mr-0.px-3{
+  font-size: 2rem;
+  font-family: 'Lobster Two', cursive;
 }

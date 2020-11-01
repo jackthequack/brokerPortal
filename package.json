@@ -19,7 +19,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "hbs": "^4.1.1",
-    "mongoose": "^5.10.11"
+    "mongoose": "^5.10.11",
+    "nodemon": "^2.0.6"
   },
   "devDependencies": {
     "chai": "^4.2.0",
