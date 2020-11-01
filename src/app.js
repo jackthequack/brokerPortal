@@ -15,7 +15,7 @@ const logger = (req, res, next) => {
 
 const use = () => {
     app.use(express.static('public'));
-    //app.set('view engine', 'hbs');
+    app.set('view engine', 'hbs');
     app.use(express.urlencoded({extended: false}));
     app.use(logger)
 }
@@ -26,12 +26,23 @@ app.get('/', (req, res) => {
 });
 
 app.get('/dashboard', (req, res)=>{
-    res.sendFile(__dirname + '/public/dashboard.html');
+    res.render('home');
 });
 app.get('/salespeople', (req, res) => {
-    res.sendFile(__dirname + '/public/dashboard.html');
+    res.render('salespeople');
 });
-
+app.get('/performance', (req,res) => {
+    res.render('performance')
+})
+app.get('/listings', (req, res) => {
+    res.render('listings')
+})
+app.get('/data', (req, res) => {
+    res.render('data')
+});
+app.get('/messages', (req, res) => {
+    res.render('messages')
+});
 
 
 app.listen(3000)
