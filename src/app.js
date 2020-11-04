@@ -4,8 +4,10 @@ const mongoose = require('mongoose');
 const Broker = mongoose.model('Broker');
 const Realtor = mongoose.model('Realtor');
 
-const app = express();
 
+const username = "Quack"
+const app = express();
+console.log(Broker)
 const logger = (req, res, next) => {
     console.log(req.method)
     console.log(req.path)
@@ -29,7 +31,12 @@ app.get('/dashboard', (req, res)=>{
     res.render('home');
 });
 app.get('/salespeople', (req, res) => {
-    res.render('salespeople');
+    Broker.create({firstName: "John", lastName: "Doe", brokerageName: "Remax", username: "Quack", password: "abc"})
+    Broker.find({}, (err, myBrokers) => { 
+        console.log(myBrokers) //This is printing out nothing
+        res.render('salespeople', {salesPeople: myBrokers.salespeople});
+    })
+    
 });
 app.get('/performance', (req,res) => {
     res.render('performance')
@@ -45,4 +52,4 @@ app.get('/messages', (req, res) => {
 });
 
 
-app.listen(3000)
+app.listen(4000)

@@ -31,4 +31,4 @@ mongoose.model('Broker', BrokerSchema); //the broker collection
 
 
 
-mongoose.connect('mongodb://localhost/broker');
+mongoose.connect('mongodb://localhost/bd');
