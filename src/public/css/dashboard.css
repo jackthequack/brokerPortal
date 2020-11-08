@@ -109,4 +109,13 @@ body {
 .navbar-brand.col-md-3.col-lg-2.mr-0.px-3{
   font-size: 2rem;
   font-family: 'Lobster Two', cursive;
+}  
+
+.inputHeader {
+    
+    display: inline;
+    padding: 3.5rem;
+}
+.inputBody{
+  display: inline;
 }

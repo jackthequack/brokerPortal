@@ -14,11 +14,21 @@ const logger = (req, res, next) => {
     next();
 }
 
+const formCleaner = (req, res, next) => {
+    for(const i in req.query){
+        if(req.query[i] == ""){
+            delete req.query[i]
+        }
+    }
+    next();
+}
+
 const use = () => {
     app.use(express.static('public'));
     app.set('view engine', 'hbs');
     app.use(express.urlencoded({extended: false}));
     app.use(logger)
+    app.use(formCleaner)
 }
 use();
 
@@ -30,15 +40,31 @@ app.get('/dashboard', (req, res)=>{
     res.render('home');
 });
 app.get('/salespeople', (req, res) => {
+        console.log("QUERY: ", req.query)
         Broker.find({}, (err, myBrokers) => {
             let name = myBrokers[0].firstName + " " + myBrokers[0].lastName;
-            console.log(name)
-            Realtor.find({}, (err, myRealtors) => {
-                console.log(myRealtors[0]);
-                for(let i = 0; i < myRealtors.length; i++){
-                    myBrokers[0].salespeople.push(myRealtors[i]);
-                }
-            })
+            let queryName = req.query.name;
+            let queryListings = req.query.listings;
+            let queryUsername = req.query.username;
+                Realtor.find({}, (err, myRealtors) => {
+                   
+                    const filteredRealtors = myRealtors.filter((a) => {
+                        
+                        if(a["name"] === queryName || a["listings"] === queryListings || a["username"] === queryUsername){
+                            return true;
+                        }
+                        else if(Object.keys(req.query).length === 0){
+                            return true;
+                        }
+                        else{false;}
+                    })
+                    console.log("FILTERED REALTORS: ", filteredRealtors)
+                    for(let j = 0; j < filteredRealtors.length; j++){
+                        myBrokers[0].salespeople.push(filteredRealtors[j]);
+                    }
+                })
+
+           
             // console.log("BROKER: ", myBrokers[0])
             res.render('salesPeople', {salespeople: myBrokers[0].salespeople});
         })

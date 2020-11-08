@@ -5,6 +5,22 @@
  {{!-- <canvas class="my-4 w-0" id="myChart" width="900" height="500"></canvas> --}}
     
      <h2>Real estate agents</h2>
+     <form action = "/salespeople" method = "get">
+    <div class='SearchContainer'>
+      <ul>
+        <li class="inputHeader">Name</li>
+        <li class="inputHeader">Listings</li>
+        <li class="inputHeader">Username</li>
+      </ul>
+      <ul>
+        <li class="inputBody"><input type="text" placeholder="ex. John Doe" name="name" class="SearchInput"></li>
+        <li class="inputBody"><input type="number" placeholder="ex. 2", name="listings" class="SearchInput"></li>
+        <li class="inputBody"><input type="text" placeholder="ex. jl8458", name="username" class="SearchInput"></li>
+        <li class="inputBody"><input type="submit" placeholder="Filter", value="Filter" class="SearchInput"></li>
+      </ul>
+        
+    </div>
+</form>
      <div class="table-responsive">
        <table class="table table-striped table-sm">
          <thead>
@@ -18,7 +34,7 @@
          <tbody>
           {{#each salespeople}}
             <tr>
-              <td>{{this.firstName}} {{this.lastName}}</td>
+              <td>{{this.name}}</td>
               <td>{{this.listings.length}}</td>
               <td>{{this.username}}</td>
               <td>{{this.password}}</td>
