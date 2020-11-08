@@ -30,5 +30,4 @@ mongoose.model('Broker', BrokerSchema); //the broker collection
 
 
 
-
-mongoose.connect('mongodb://localhost/RD');
+mongoose.connect('mongodb://localhost/portal');

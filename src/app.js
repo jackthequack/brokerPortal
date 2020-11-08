@@ -1,13 +1,13 @@
 const express = require('express');
 const db = require('./db.js');
 const mongoose = require('mongoose');
-const Broker = mongoose.model('Broker');
+const broker = mongoose.model('broker');
 const Realtor = mongoose.model('Realtor');
 
 
 const username = "Quack"
 const app = express();
-console.log(Broker)
+console.log(broker)
 const logger = (req, res, next) => {
     console.log(req.method)
     console.log(req.path)
@@ -31,11 +31,16 @@ app.get('/dashboard', (req, res)=>{
     res.render('home');
 });
 app.get('/salespeople', (req, res) => {
-    Broker.create({firstName: "John", lastName: "Doe", brokerageName: "Remax", username: "Quack", password: "abc"})
-    Broker.find({}, (err, myBrokers) => { 
-        console.log(myBrokers) //This is printing out nothing
-        res.render('salespeople', {salesPeople: myBrokers.salespeople});
-    })
+        Realtor.find({}, (err, myRealtor) => {
+            console.log("Realtor ::", myRealtor[0]);
+            res.render('salespeople');
+        })
+        // broker.find({}, (err, myData) => {
+        //     console.log("BROKER: ", myData)
+        //     res.render('salespeople');
+        // })
+        
+  
     
 });
 app.get('/performance', (req,res) => {
