@@ -7,7 +7,6 @@ const Realtor = mongoose.model('Realtor');
 
 const username = "Quack"
 const app = express();
-console.log(broker)
 const logger = (req, res, next) => {
     console.log(req.method)
     console.log(req.path)
@@ -31,9 +30,17 @@ app.get('/dashboard', (req, res)=>{
     res.render('home');
 });
 app.get('/salespeople', (req, res) => {
-        Broker.find({}, (err, myData) => {
-            console.log("BROKER: ", myData)
-            res.render('salespeople');
+        Broker.find({}, (err, myBrokers) => {
+            let name = myBrokers[0].firstName + " " + myBrokers[0].lastName;
+            console.log(name)
+            Realtor.find({}, (err, myRealtors) => {
+                console.log(myRealtors[0]);
+                for(let i = 0; i < myRealtors.length; i++){
+                    myBrokers[0].salespeople.push(myRealtors[i]);
+                }
+            })
+            // console.log("BROKER: ", myBrokers[0])
+            res.render('salesPeople', {salespeople: myBrokers[0].salespeople});
         })
         
   

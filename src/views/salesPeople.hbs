@@ -11,12 +11,20 @@
            <tr>
              <th>Name</th>
              <th>Currently Listed</th>
-             <th>Sold (last month)</th>
-             <th>Avg. DOM</th>
+             <th>Username</th>
+             <th>Password</th>
            </tr>
          </thead>
          <tbody>
-           <tr>
+          {{#each salespeople}}
+            <tr>
+              <td>{{this.firstName}} {{this.lastName}}</td>
+              <td>{{this.listings.length}}</td>
+              <td>{{this.username}}</td>
+              <td>{{this.password}}</td>
+            </tr>
+          {{/each}}
+           {{!-- <tr>
              <td>John Doe</td>
              <td>10</td>
              <td>5</td>
@@ -125,7 +133,7 @@
              <td>ligula</td>
              <td>in</td>
            
-           </tr>
+           </tr> --}}
          </tbody>
        </table>
      </div>
