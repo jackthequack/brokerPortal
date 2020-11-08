@@ -1,7 +1,7 @@
 const express = require('express');
 const db = require('./db.js');
 const mongoose = require('mongoose');
-const broker = mongoose.model('broker');
+const Broker = mongoose.model('Broker');
 const Realtor = mongoose.model('Realtor');
 
 
@@ -31,14 +31,10 @@ app.get('/dashboard', (req, res)=>{
     res.render('home');
 });
 app.get('/salespeople', (req, res) => {
-        Realtor.find({}, (err, myRealtor) => {
-            console.log("Realtor ::", myRealtor[0]);
+        Broker.find({}, (err, myData) => {
+            console.log("BROKER: ", myData)
             res.render('salespeople');
         })
-        // broker.find({}, (err, myData) => {
-        //     console.log("BROKER: ", myData)
-        //     res.render('salespeople');
-        // })
         
   
     
