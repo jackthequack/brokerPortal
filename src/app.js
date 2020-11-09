@@ -84,6 +84,16 @@ app.get('/data', (req, res) => {
 app.get('/messages', (req, res) => {
     res.render('messages')
 });
+app.post('/salespeople', (req, res) => {
 
+        let newRealtor = new Realtor({name: req.body.name, username: req.body.username, password: req.body.password, broker: "John Doe"})
+        newRealtor.save((err, myRealtor) => {
+            if(err) {console.log(err)} else{console.log(myRealtor.name, " SUCCESSFULLY ADDED")}
+            
+        });
+    
+    res.redirect('/salespeople')
 
-app.listen(4000)
+})
+
+app.listen(process.env.PORT || 3000)

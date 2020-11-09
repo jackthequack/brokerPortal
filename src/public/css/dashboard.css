@@ -119,3 +119,8 @@ body {
 .inputBody{
   display: inline;
 }
+.AddContainer{
+  position: relative;
+  margin-left: 45rem;
+  bottom: 5rem;
+}
