@@ -1,5 +1,6 @@
 // db.js
 const mongoose = require('mongoose');
+//const passportLocalMongoose = require('passport-local-mongoose');
 const UserSchema = new mongoose.Schema({
   name: {type: String, required: true},
   username: {type: String, required: true},
@@ -8,6 +9,9 @@ const UserSchema = new mongoose.Schema({
   reqID: String,
   broker: {type: String, required: true}
 });
+//UserSchema.plugin(passportLocalMongoose);
+
+//mongoose.model('Realtor', UserSchema, 'Realtor');
 
 mongoose.model('Realtor', UserSchema);
 
@@ -23,6 +27,10 @@ const BrokerSchema = new mongoose.Schema({
 });
 
 // alternative here is to make a new collection per brokerage
+
+//BrokerSchema.plugin(passportLocalMongoose);
+
+//mongoose.model('Broker', BrokerSchema, 'Broker');
 
 mongoose.model('Broker', BrokerSchema); //the broker collection
 
@@ -43,7 +51,7 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
  // if we're not in PRODUCTION mode, then use
  dbconf = 'mongodb://localhost/portal';
 }
-console.log(dbconf)
+//console.log(dbconf)
 mongoose.connect(dbconf);
 
 
