@@ -1,11 +1,28 @@
 const express = require('express');
 const db = require('./db.js');
+const path = require('path');
+const fs = require('fs');
+// const JSON = require('json');
+const crypto = require('crypto')
+const csv = require('fast-csv')
+const multer = require('multer');
 const mongoose = require('mongoose');
 const Broker = mongoose.model('Broker');
 const Realtor = mongoose.model('Realtor');
 //const passportLocalMongoose = require('passport-local-mongoose');
 //const connectEnsureLogin = require('connect-ensure-login');
-const username = "Quack"
+const storage = multer.diskStorage({ //Used for dynamic naming of images https://www.digitalocean.com/community/tutorials/nodejs-uploading-files-multer-express
+    destination: './public',
+    filename: function (req, file, callback) {
+      crypto.pseudoRandomBytes(16, function(err, raw) {
+        if (err) {return callback(err);}
+      
+        callback(null, raw.toString('hex') + path.extname(file.originalname));
+      });
+    }
+  });
+  const upload = multer({ storage: storage });
+
 const app = express();
 const logger = (req, res, next) => {
     console.log(req.method)
@@ -124,8 +141,46 @@ app.get('/listings',/* connectEnsureLogin.ensureLoggedIn(),*/ (req, res) => {
     res.render('listings')
 })
 app.get('/data',/* connectEnsureLogin.ensureLoggedIn(),*/ (req, res) => {
-    res.render('data')
+    
+    Realtor.findOne({name: "Loser McLoserFace"}, (err, myRealtor) => {
+        res.render('data', {data: encodeURIComponent(JSON.stringify(myRealtor.data))});
+    })
+    
 });
+app.post('/data', upload.single('csvData'), (req, res) => {
+    if(req.file.mimetype !== "text/csv"){
+        res.send("Wrong file type");
+        return;
+      }
+    let fileRows = [];
+    csv.parseFile(req.file.path)
+    .on("data", function (data) {
+      fileRows.push(data); // push each row
+    })
+    .on("end", function () {
+      console.log(fileRows) //contains array of arrays. Each inner array represents row of the csv file, with each element of it a column
+      fs.unlinkSync(req.file.path);   // remove temp file
+      //process "fileRows" and respond
+      setRealtorData();
+    })
+    let setRealtorData = () => {
+        let userData = []
+        for(let i = 0; i < fileRows.length; i++){
+        for(j = 0; j < fileRows[i].length; j++){
+            fileRows[i][j] = parseFloat(fileRows[i][j])
+        }
+        
+        userData.push({lat: fileRows[i][0], long: fileRows[i][1]})
+        }
+        console.log(userData);
+        Realtor.updateOne({name: "Loser McLoserFace"}, {$set: {data: userData}}, function(err, resp) {
+            if(err){console.log(err)}
+            else{console.log("Successful: ", resp.result)}
+    })
+    res.redirect('/data')
+    }
+    
+})
 app.get('/messages',/* connectEnsureLogin.ensureLoggedIn(),*/ (req, res) => {
     res.render('messages')
 });
@@ -136,7 +191,7 @@ app.post('/salespeople',/* connectEnsureLogin.ensureLoggedIn(),*/ (req, res) => 
             if(err) {console.log(err)} else{console.log(myRealtor.name, " SUCCESSFULLY ADDED")}
 
         });
-
+    
     res.redirect('/salespeople')
 
 })

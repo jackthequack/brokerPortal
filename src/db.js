@@ -6,6 +6,7 @@ const UserSchema = new mongoose.Schema({
   username: {type: String, required: true},
   password: {type: String, required: true}, //will turn into a hash
   listings: [{address: String, listprice: String, clientName: String }], //will be added to
+  data: [{lat: Number, long: Number}],
   reqID: String,
   broker: {type: String, required: true}
 });
