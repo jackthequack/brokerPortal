@@ -1,11 +1,12 @@
 // db.js
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 const passportLocalMongoose = require('passport-local-mongoose');
 
 const UserSchema = new mongoose.Schema({
   name: {type: String},
   username: {type: String, required: true},
   listings: [{address: String, listprice: String, clientName: String }], //will be added to
+  data: [{lat: Number, long: Number}],
   reqID: String,
   brokerage: {type: String}
 });
@@ -28,7 +29,7 @@ const BrokerSchema = new mongoose.Schema({
 
 BrokerSchema.plugin(passportLocalMongoose);
 
-mongoose.model('Broker', BrokerSchema, 'Broker');
+mongoose.model('Broker', BrokerSchema);
 
 //mongoose.model('Broker', BrokerSchema); //the broker collection
 
@@ -55,4 +56,4 @@ mongoose.connect(dbconf);
 */
 
 
-mongoose.connect('mongodb://localhost/tester');
+mongoose.connect('mongodb://localhost/portal')

@@ -1,5 +1,5 @@
-<script>
-    let element = document.getElementById("Dashboard header")
+  <script>
+  let element = document.getElementById("Dashboard header")
     element.style.display = "none"
 </script>
 <h1>My Map </h1>
@@ -9,18 +9,37 @@
         width: 100%;
     }
 </style>
+<form action="" method="POST" enctype="multipart/form-data">
+    <input type="file" placeholder="MLS Data" name="csvData" class="DataInput">
+    <input type="submit">
+</form>
+
 <div id="map">
 
 </div>
 <script>
     function initMap(){
+        let data = decodeURIComponent("{{{data}}}")
+        var decodeData = JSON.parse(data);
         map = new google.maps.Map(document.getElementById("map"), {
             center: {lat: 26.3683 , lng: -80.1289},
             zoom: 8,
         });
+        
+        for(i in decodeData){
+            
+            let marker = new google.maps.Marker({position: {lat: decodeData[i].lat, lng: decodeData[i].long}, map:map})
+        }
     }
 </script>
 <script async
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtQLabgYP4fd7rtzu2UTEnx_0R7GodzKo&callback=initMap&libraries=&v=weekly"
       defer
     ></script>
+
+{{!-- {{#each data}}
+    <script this=this>
+        let marker = new google.maps.marker({position: {lat: this.lat, long: this.long}}, map: map)
+    </script>
+    
+{{/each}} --}}
