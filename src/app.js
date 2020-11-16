@@ -27,7 +27,7 @@ const storage = multer.diskStorage({ //Used for dynamic naming of images https:/
     filename: function (req, file, callback) {
       crypto.pseudoRandomBytes(16, function(err, raw) {
         if (err) {return callback(err);}
-      
+
         callback(null, raw.toString('hex') + path.extname(file.originalname));
       });
     }
@@ -191,15 +191,44 @@ app.get('/salespeople', (req, res) => {
 app.get('/performance',  (req,res) => {
     res.render('performance')
 })
+
+// this gets the form data, gets the realtor by username, and then adds the listing.
+// i have a hardcoded username in there now. Will need to update that.
+app.post('/listings', (req, res)=> {
+  //get the form data and make a listing out of it
+  let listing = {
+    address: req.body.address,
+    listprice: req.body.listprice,
+    clientName: req.body.clientName,
+    listDate: req.body.listDate,
+    status: req.body.status
+  }
+
+  Realtor.findOne({username: 'ejd@test.com'}, (err, real)=>{
+    let listings = real.listings;
+    listings.push(listing);
+    Realtor.updateOne({username: 'ejd@test.com'}, {$set: {listings: listings}}, function(err, resp) {
+        if(err){console.log(err)}
+        else{console.log("Successful: ", resp.result)}
+  });
+  console.log(listings);
+  });
+
+
+
+  res.redirect("/listings");
+});
+
+
 app.get('/listings',  (req, res) => {
     res.render('listings')
 })
 app.get('/data',/* connectEnsureLogin.ensureLoggedIn(),*/ (req, res) => {
-    
+
     Realtor.findOne({name: "Loser McLoserFace"}, (err, myRealtor) => {
         res.render('data', {data: encodeURIComponent(JSON.stringify(myRealtor.data))});
     })
-    
+
 });
 app.post('/data', upload.single('csvData'), (req, res) => {
     if(req.file.mimetype !== "text/csv"){
@@ -223,7 +252,7 @@ app.post('/data', upload.single('csvData'), (req, res) => {
         for(j = 0; j < fileRows[i].length; j++){
             fileRows[i][j] = parseFloat(fileRows[i][j])
         }
-        
+
         userData.push({lat: fileRows[i][0], long: fileRows[i][1]})
         }
         console.log(userData);
@@ -233,7 +262,7 @@ app.post('/data', upload.single('csvData'), (req, res) => {
     })
     res.redirect('/data')
     }
-    
+
 })
 app.get('/messages',/* connectEnsureLogin.ensureLoggedIn(),*/ (req, res) => {
     res.render('messages')

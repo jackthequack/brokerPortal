@@ -5,7 +5,7 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const UserSchema = new mongoose.Schema({
   name: {type: String},
   username: {type: String, required: true},
-  listings: [{address: String, listprice: String, clientName: String }], //will be added to
+  listings: [{address: String, listprice: String, clientName: String , listDate: String, status: String}], //will be added to
   data: [{lat: Number, long: Number}],
   reqID: String,
   brokerage: {type: String}
@@ -56,4 +56,4 @@ mongoose.connect(dbconf);
 */
 
 
-mongoose.connect('mongodb://localhost/portal')
+mongoose.connect('mongodb://localhost/tester');
