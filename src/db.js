@@ -4,17 +4,26 @@ const passportLocalMongoose = require('passport-local-mongoose');
 
 const UserSchema = new mongoose.Schema({
   name: {type: String},
+  account: String
+});
+
+UserSchema.plugin(passportLocalMongoose);
+
+mongoose.model('User', UserSchema);
+
+
+const RealtorSchema = new mongoose.Schema({
+  name: {type: String},
   username: {type: String, required: true},
-  listings: [{address: String, listprice: String, clientName: String , listDate: String, status: String}], //will be added to
+  listings: [{address: String, listprice: String, clientName: String, listDate: String, status: String, dom: Number}], //will be added to
   data: [{lat: Number, long: Number}],
   reqID: String,
   brokerage: {type: String}
 });
 
-UserSchema.plugin(passportLocalMongoose);
 
-mongoose.model('Realtor', UserSchema);
 
+mongoose.model('Realtor', RealtorSchema);
 // my schema goes here!
 
 const BrokerSchema = new mongoose.Schema({
@@ -22,12 +31,12 @@ const BrokerSchema = new mongoose.Schema({
   brokerage: {type: String},
   salespeople: [UserSchema], //note: this subdocument structure doesn't allow to save nested docs individually. Have to save the parent (broker);
   username: {type: String, required: true},
+  data: [{lat: Number, long: Number}],
   reqID: String     //similar to homework we can use this to manage cookies
 });
 
 // alternative here is to make a new collection per brokerage
 
-BrokerSchema.plugin(passportLocalMongoose);
 
 mongoose.model('Broker', BrokerSchema);
 
@@ -55,5 +64,10 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
 mongoose.connect(dbconf);
 */
 
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
 
-mongoose.connect('mongodb://localhost/tester');
+
+mongoose.connect('mongodb://localhost/finaltest');
