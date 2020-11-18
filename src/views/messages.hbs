@@ -1,5 +1,13 @@
 <script>
-    let element = document.getElementById("Dashboard header")
-    element.style.display = "none"
+    let element = document.getElementById("Dashboard header")
+    element.style.display = "none"
 </script>
-<h1>Here are your messages</h1>
+<body>
+        <form action="" id="chat-form">
+              <input id="m" autocomplete="off" /><button>Send</button>
+        </form>
+        <ul id="messages"></ul>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/main.js"></script>
+</body>

@@ -25,9 +25,9 @@
             center: {lat: 26.3683 , lng: -80.1289},
             zoom: 8,
         });
-        
+
         for(i in decodeData){
-            
+
             let marker = new google.maps.Marker({position: {lat: decodeData[i].lat, lng: decodeData[i].long}, map:map})
         }
     }
@@ -41,5 +41,5 @@
     <script this=this>
         let marker = new google.maps.marker({position: {lat: this.lat, long: this.long}}, map: map)
     </script>
-    
+
 {{/each}} --}}
