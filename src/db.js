@@ -42,7 +42,7 @@ mongoose.model('Broker', BrokerSchema);
 
 //mongoose.model('Broker', BrokerSchema); //the broker collection
 
-/*
+
 let dbconf;
 if (process.env.NODE_ENV === 'PRODUCTION') {
  // if we're in PRODUCTION mode, then read the configration from a file
@@ -62,7 +62,7 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
 }
 //console.log(dbconf)
 mongoose.connect(dbconf);
-*/
+
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -70,4 +70,4 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
 
-mongoose.connect('mongodb://localhost/finaltest');
+//mongoose.connect('mongodb://localhost/finaltest');
