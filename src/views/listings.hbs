@@ -3,13 +3,15 @@
     element.style.display = "none"
 </script>
 
+
+
 <form action="/listings" method="POST">
   <h1> Add a Listing</h1>
   <input type="text" name="address" placeholder="address" required>
   <input type="text" name="city" placeholder="city" required>
   <input type="text" name="listprice" placeholder="list price" required>
   <input type="text" name="clientName" placeholder="Client Name" required>
-  <input type="text" name="listDate" placeholder="listing date" required>
+  <input type="date" name="listDate" placeholder="listing date" required>
   <input type="text" name="status" placeholder="active? (y/n)" required>
   <button>Submit</button>
 </form>
@@ -26,6 +28,7 @@
              <th>Listing date</th>
              <th>Active (y/n)</th>
 
+
            </tr>
          </thead>
          <tbody>
@@ -36,6 +39,7 @@
                <td>{{this.clientName}}</td>
                <td>{{this.listDate}}</td>
                <td>{{this.status}}</td>
+            
              </tr>
            {{/each}}
          </tbody>

@@ -2,8 +2,9 @@
 const mongoose = require('mongoose')
 const passportLocalMongoose = require('passport-local-mongoose');
 
+//look into this!
 const UserSchema = new mongoose.Schema({
-  name: {type: String},
+  username: {type: String},
   account: String
 });
 
@@ -15,7 +16,7 @@ mongoose.model('User', UserSchema);
 const RealtorSchema = new mongoose.Schema({
   name: {type: String},
   username: {type: String, required: true},
-  listings: [{address: String, listprice: String, clientName: String, listDate: String, status: String, dom: Number}], //will be added to
+  listings: [{address: String, listprice: String, clientName: String, listDate: String, status: String, dom: Number, city: String}], //will be added to
   data: [{lat: Number, long: Number}],
   reqID: String,
   brokerage: {type: String}
@@ -42,7 +43,7 @@ mongoose.model('Broker', BrokerSchema);
 
 //mongoose.model('Broker', BrokerSchema); //the broker collection
 
-
+/*
 let dbconf;
 if (process.env.NODE_ENV === 'PRODUCTION') {
  // if we're in PRODUCTION mode, then read the configration from a file
@@ -62,7 +63,7 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
 }
 //console.log(dbconf)
 mongoose.connect(dbconf);
-
+*/
 
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
@@ -70,4 +71,4 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
 
-//mongoose.connect('mongodb://localhost/finaltest');
+mongoose.connect('mongodb://localhost/finaltest');

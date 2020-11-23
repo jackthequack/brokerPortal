@@ -12,6 +12,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
+const Chart = require('chart.js');
 
 const db = require('./db.js');
 
@@ -90,7 +91,8 @@ io.on('connection', function(socket){ 
          socket.on('disconnect', () => { 
          io.emit('message', "A user has left the chat")     }) 
          socket.on('chatMessage', (msg) => { 
-           io.emit('message', msg);     }) 
+           //let nameofuser = req.user.username;
+           socket.broadcast.emit('message', msg);  }) 
              }); 
 
 app.get("/", function (req, res) {
@@ -197,7 +199,7 @@ app.get('/salespeople', isLoggedIn, (req, res) => {
 
               //  Realtor.findOne({}, (err, myRealtors) => {
                     if(myBrokers.salespeople == undefined){
-                      res.render('salespeople');
+                      res.render('salesPeople');
                     }
                     else{
                         const filteredRealtors = myBrokers.salespeople.filter((a) => {
@@ -226,47 +228,20 @@ app.get('/salespeople', isLoggedIn, (req, res) => {
 
 });
 app.get('/performance', isLoggedIn, (req,res) => {
-  let lists = [];
-
-  Realtor.findOne({username: req.user.username}, (err, real)=>{
-    let listings = real.listings;
-    lists = real.listings;
-    let cityListings = [];
-
-
-    // get the average -- this works
-    const averageAll = listings.reduce(function(total, curr){
-      const add = parseInt(curr.listprice);
-      if(Number.isNaN(add)===false && add>=0){
-        return total += add;}
-        else{ return total;}
-      },0) / listings.length;
-
-      console.log(averageAll);
-
-
-    })//end of realtor.findONe
-    console.log("hello there", lists);
-    /*
-
-    for(let i=0; i<listings.length; i++){
-      if(cityListings[i] != undefined && cityListings[i]!= null){
-        if(cityListings[i].city === curr.city){
-          cityListings[i].num += 1;
-          cityListings[i].price += parseInt(curr.listingprice);
-          check = 1;
-        }
-    }
-    else{
-        cityListings.push({city: curr.city, num: 1, price: parseInt(curr.listingprice)});
-      }
-    }
-
-*/
-
-
-    res.render('performance')
+      res.render('performance');
 }); // end of the get for performance
+
+//get the data
+app.get('/api/data', (req, res) =>{
+
+  Realtor.find({username: req.user.username}, (err, realtors, count)=>{
+    res.json(realtors.map(function(ele){
+      return{
+        'listings': ele.listings
+      };
+    }));
+    });
+});
 
 // this gets the form data, gets the realtor by username, and then adds the listing.
 // i have a hardcoded username in there now. Will need to update that.
@@ -278,7 +253,8 @@ app.post('/listings', (req, res)=> {
     clientName: req.body.clientName,
     listDate: req.body.listDate,
     city: req.body.city,
-    status: req.body.status
+    status: req.body.status,
+    dom: 0
   }
   if(listing.address !== ""){ //make sure listing has an address at least
 
@@ -355,13 +331,12 @@ app.post('/data', upload.single('csvData'), (req, res) => {
     }
 
 })
-app.get('/messages',/* connectEnsureLogin.ensureLoggedIn(),*/ (req, res) => {
-    res.render('messages')
+app.get('/messages', isLoggedIn,  (req, res) => {
+    //let name = {name: req.user.username};
+    res.render('messages');
 });
 
-app.get('/messages', isLoggedIn,  (req, res) => {
-    res.render('messages')
-});
+
 app.post('/salespeople', (req, res) => {
 
         let newRealtor = new Realtor({name: req.body.name, username: req.body.username, broker: req.user.username})
