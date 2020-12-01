@@ -1,0 +1,144 @@
+
+
+
+<form  action="" method="POST" enctype="multipart/form-data">
+    <input id="fileMLS" type="file" placeholder="MLS Data" name="csvData" class="DataInput">
+    <input id="mlsBtn" type="submit">
+</form>
+<h3>Summary Statistics</h3>
+<table>
+  <thead>
+    <th></th>
+    <th>Beds</th>
+    <th>Baths</th>
+    <th>List price</th>
+    <th>Sold Price</th>
+    <th>Sqft</th>
+    <th>DOM</th>
+    <th>Price/SqFt</th>
+  </thead>
+  <tbody>
+    <tr id="rAvg">
+     <th scope="row">Avg</th>
+   </tr>
+   <tr id="rMed">
+    <th scope="row">Med</th>
+  </tr>
+  <tr id="rLow">
+   <th scope="row">Low</th>
+ </tr>
+ <tr id="rHigh">
+  <th scope="row">High</th>
+</tr>
+  </tbody>
+</table>
+<style>
+    .container {
+        width: 70%;
+        height: 60%;
+    }
+</style>
+<body>
+
+    <div class="container">
+        <h3>Bar Graph of Prices Sold</h3>
+        <canvas id="myChart2"></canvas>
+        <h3>Pie Chart of Days On Market</h3>
+        <canvas id="myChart3"></canvas>
+    </div>
+
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", main);
+  function main(){
+
+    let data = decodeURIComponent("{{{stats}}}")
+    var decodeData = JSON.parse(data);
+    //console.log(decodeData);
+    var body = document.querySelector('body');
+    var table = document.querySelector('table');
+    table.classList = 'table';
+    var tbody = document.querySelector('tbody');
+    var nBody = document.createElement('tbody');
+    var form = document.querySelector('#theForm');
+
+    //the summary statistics are here.
+    var avg = [];
+    var med = [];
+    var low = [];
+    var high = [];
+    var matrix = [];
+
+    //console.log(decodeData);
+    for(i in decodeData){
+      avg.push(decodeData[i].average);
+      med.push(decodeData[i].median);
+      low.push(decodeData[i].low);
+      high.push(decodeData[i].high);
+    }
+    matrix.push(avg);
+    matrix.push(med);
+    matrix.push(low);
+    matrix.push(high);
+    for(let i=0;i<4; i++){
+      var row;
+      if(i==0){
+        row = document.querySelector("#rAvg");
+      }else if(i==1){
+        row =document.querySelector("#rMed");
+      } else if(i==2){
+        row = document.querySelector("#rLow");
+      } else{
+        row = document.querySelector("#rHigh");
+      }
+
+      for(let j=0; j<avg.length; j++){
+
+        row.appendChild(document.createElement('td')).textContent = matrix[i][j];
+      }
+      nBody.appendChild(row);
+    }
+    table.replaceChild(nBody, tbody);
+
+    //-------------------------------------------------------------
+    // END OF table
+    labels = ["Low", "Average", "Median", "High" ];
+    dataSet =[];
+    dataSet.push(decodeData[3].low);
+    dataSet.push(decodeData[3].average);
+    dataSet.push(decodeData[3].median);
+    dataSet.push(decodeData[3].high);
+    renderChart(dataSet, labels, "bar", "myChart2", "Sold Prices");
+
+    //--------------------------------------------------------------
+    dataDom = [];
+    dataDom.push(decodeData[5].low);
+    dataDom.push(decodeData[5].average);
+    dataDom.push(decodeData[5].median);
+    dataDom.push(decodeData[5].high);
+    renderChart(dataDom, labels, "pie", "myChart3", "Days on Market");
+
+
+}//end of main
+
+function renderChart(data, labels, type, canvas, label) {
+    var ctx = document.getElementById(canvas).getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: type,
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor : "rgba(192,192,192,1)"
+            }]
+        },
+    });
+}
+
+
+</script>

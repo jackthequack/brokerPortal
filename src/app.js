@@ -13,6 +13,7 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const Chart = require('chart.js');
+const cma= require('./cmaAPI.js'); //cma API
 
 const db = require('./db.js');
 
@@ -43,11 +44,26 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(bodyParser.json());
 
+/*
 app.use(require("express-session")({
     secret: "Secret",
     resave: false,
     saveUninitialized: false
 }));
+*/
+
+let session = require("express-session");
+
+let sessionMiddleware = session({
+  secret: "Secret",
+  resave: false,
+  saveUninitialized: false,
+  store: new (require("connect-mongo")(session))({
+    url: "mongodb://localhost/portal"
+})
+})
+app.use(sessionMiddleware);
+
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -57,7 +73,16 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
+function middleCare(req, res, next){
+  if(req.user != undefined){
+    req.session.nameofuser = req.user.username;
+    res.locals.name = req.session.nameofuser;
+  }
 
+
+  next();
+}
+app.use(middleCare);
 
 const logger = (req, res, next) => {
     console.log(req.method)
@@ -84,16 +109,44 @@ const use = () => {
 }
 use();
 
-io.on('connection', function(socket){ 
-     console.log('a user connected'); 
-         io.emit('message', "Welcome to your messages.") 
-         socket.broadcast.emit('message', "A user has joined the chat"); 
-         socket.on('disconnect', () => { 
-         io.emit('message', "A user has left the chat")     }) 
-         socket.on('chatMessage', (msg) => { 
-           //let nameofuser = req.user.username;
-           socket.broadcast.emit('message', msg);  }) 
-             }); 
+const botName = "Moderator"
+
+
+const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+
+io.use(wrap(sessionMiddleware));
+io.use(wrap(passport.initialize()));
+io.use(wrap(passport.session()));
+// io.use((socket, next) => {
+//   if (socket.request.user) {
+//     next();
+//   } else {
+//     next(new Error('unauthorized'))
+//   }
+// });
+const moment = require('moment');
+const formatMessage = (username, text) => {
+    return {username,
+        text,
+        time: moment().format('h:mm a')}
+}
+
+io.on('connection', function(socket){
+  // const username = socket.request.user.username
+  // let username = socket.request.session.passport.user;
+  console.log(socket.request.user)
+  console.log('a user connected');
+  socket.emit('message', formatMessage(botName, "Welcome to your messages."))
+  socket.on('chatMessage', (msg) => {
+      console.log(msg)
+      socket.emit('message', formatMessage(socket.request.user.username, msg));
+      socket.broadcast.emit('message', formatMessage(socket.request.user.username, msg))
+  })
+  const session = socket.request.session;
+  console.log(`saving sid ${socket.id} in session ${session.id}`);
+  session.socketId = socket.id;
+  session.save();
+})
 
 app.get("/", function (req, res) {
     res.render("home");
@@ -228,10 +281,12 @@ app.get('/salespeople', isLoggedIn, (req, res) => {
 
 });
 app.get('/performance', isLoggedIn, (req,res) => {
+      console.log("hello");
+      console.log(req.user.username + "");
       res.render('performance');
 }); // end of the get for performance
 
-//get the data
+//API to get data and send back to mychart.js
 app.get('/api/data', (req, res) =>{
 
   Realtor.find({username: req.user.username}, (err, realtors, count)=>{
@@ -337,7 +392,7 @@ app.get('/messages', isLoggedIn,  (req, res) => {
 });
 
 
-app.post('/salespeople', (req, res) => {
+app.post('/salespeople',  (req, res) => {
 
         let newRealtor = new Realtor({name: req.body.name, username: req.body.username, broker: req.user.username})
             newRealtor.save((err, myRealtor) => {
@@ -357,6 +412,67 @@ app.get("/logout", function (req, res) {
     req.logout();
     res.redirect("/");
 });
+
+app.post("/cma", upload.single('csvData'), function(req, res){
+
+  if(req.file.mimetype !== "text/csv"){
+      res.send("Wrong file type");
+      return;
+    }
+
+  let fileRows = [];
+  csv.parseFile(req.file.path)
+  .on("data", function (data) {
+    fileRows.push(data); // push each row
+  })
+  .on("end", function () {
+    //console.log(fileRows) //contains array of arrays. Each inner array represents row of the csv file, with each element of it a column
+    //stats = cma.getSummaryStatistics(fileRows);
+    fs.unlinkSync(req.file.path);   // remove temp file
+    setRealtorData(fileRows);
+    //process "fileRows" and respond
+  })
+  let setRealtorData = (data) => {
+      new Promise(function(resolve, reject){
+          let stats = cma.getSummaryStatistics(data);
+          resolve(stats);
+
+
+
+      }).then(function(result){
+        console.log(result);
+        //console.log("stats are"+result);
+        Realtor.updateOne({username: req.user.username}, {$set: {stats: undefined}}, function(err, resp) {
+            if(err){console.log(err)}
+            else{console.log("Successful! ")}
+          })
+        Realtor.updateOne({username: req.user.username}, {$set: {stats: result}}, function(err, resp) {
+              if(err){console.log(err)}
+              else{console.log("Successful! ")}
+            })
+      });
+
+
+      //let result = Promise.resolve(fileRows);
+      //console.log(stats);
+
+      //console.log("stats are "+stats);
+
+        res.redirect('/cma');
+  }
+
+  //console.log(fileRows);
+
+})
+
+//pickup here tomorrow! use the decode and json parse to get the data and make the charts
+
+app.get("/cma", isLoggedIn, (req,res)=>{
+  Realtor.findOne({username: req.user.username}, (err, myRealtor) => {
+      res.render('cma', {stats: encodeURIComponent(JSON.stringify(myRealtor.stats))});
+  })
+
+})
 
 /*
 app.get('/user',
