@@ -473,14 +473,27 @@ app.post("/cma", upload.single('csvData'), function(req, res){
       }).then(function(result){
         console.log(result);
         //console.log("stats are"+result);
-        Realtor.updateOne({username: req.user.username}, {$set: {stats: undefined}}, function(err, resp) {
-            if(err){console.log(err)}
-            else{console.log("Successful! ")}
-          })
-        Realtor.updateOne({username: req.user.username}, {$set: {stats: result}}, function(err, resp) {
-              if(err){console.log(err)}
-              else{console.log("Successful! ")}
-            })
+	if(req.user.account = "R"){
+
+	        Realtor.updateOne({username: req.user.username}, {$set: {stats: undefined}}, function(err, resp) {
+        	    if(err){console.log(err)}
+           	    else{console.log("Successful! ")}
+         	 })
+       		 Realtor.updateOne({username: req.user.username}, {$set: {stats: result}}, function(err, resp) {
+             		 if(err){console.log(err)}
+             		 else{console.log("Successful! ")}
+           	 })
+	}
+	else{
+		Broker.updateOne({username: req.user.username}, {$set: {stats: undefined}}, function(err, resp) {
+                    if(err){console.log(err)}
+                    else{console.log("Successful! ")}
+                 })
+                 Broker.updateOne({username: req.user.username}, {$set: {stats: result}}, function(err, resp) {
+                         if(err){console.log(err)}
+                         else{console.log("Successful! ")}
+                 })
+	}
       });
 
 
@@ -499,9 +512,17 @@ app.post("/cma", upload.single('csvData'), function(req, res){
 //pickup here tomorrow! use the decode and json parse to get the data and make the charts
 
 app.get("/cma", isLoggedIn, (req,res)=>{
-  Realtor.findOne({username: req.user.username}, (err, myRealtor) => {
-      res.render('cma', {stats: encodeURIComponent(JSON.stringify(myRealtor.stats))});
-  })
+  if(req.user.account == "R"){
+	  Realtor.findOne({username: req.user.username}, (err, myRealtor) => {
+    	  res.render('cma', {stats: encodeURIComponent(JSON.stringify(myRealtor.stats))});
+ 	   })
+   }
+  else{
+	 Broker.findOne({username: req.user.username}, (err, myBroker) => {
+          res.render('cma', {stats: encodeURIComponent(JSON.stringify(myBroker.stats))});
+           })
+   }
+
 
 })
 

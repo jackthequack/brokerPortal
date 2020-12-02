@@ -33,6 +33,7 @@ const BrokerSchema = new mongoose.Schema({
   name: {type: String},
   brokerage: {type: String},
   salespeople: [RealtorSchema], //note: this subdocument structure doesn't allow to save nested docs individually. Have to save the parent (broker);
+  stats: [{low: Number, high: Number, median: Number, average: Number}],
   username: {type: String, required: true},
   data: [{lat: Number, long: Number}],
   reqID: String     //similar to homework we can use this to manage cookies
