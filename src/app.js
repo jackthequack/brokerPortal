@@ -352,11 +352,20 @@ app.get('/listings', isLoggedIn, (req, res) => {
       })
     }
 });
-app.get('/data',isLoggedIn, (req, res) => {
 
+app.get('/data', isLoggedIn, (req, res) => {
+	
     Realtor.findOne({username: req.user.username}, (err, myRealtor) => {
-        res.render('data', {data: encodeURIComponent(JSON.stringify(myRealtor.data))});
+        if(myRealtor){
+		res.render('data', {data: encodeURIComponent(JSON.stringify(myRealtor.data))});
+	}
+	else{
+		Broker.findOne({username: req.user.username}, (err, myBroker) => {
+			res.render('data', {data: encodeURIComponent(JSON.stringify(myBroker.data))})
+		});
+	}
     })
+
 
 });
 app.post('/data', upload.single('csvData'), (req, res) => {
@@ -385,10 +394,18 @@ app.post('/data', upload.single('csvData'), (req, res) => {
         userData.push({lat: fileRows[i][0], long: fileRows[i][1]})
         }
         console.log(userData);
+	if(req.user.account == 'R'){
         Realtor.updateOne({username: req.user.username}, {$set: {data: userData}}, function(err, resp) {
             if(err){console.log(err)}
             else{console.log("Successful: ", resp.result)}
-    })
+	 })
+	}
+	else{
+	Broker.updateOne({username: req.user.username}, {$set: {data: userData}}, function(err, resp) {
+            if(err){console.log(err)}
+            else{console.log("Successful: ", resp.result)} 
+         })
+        }
     res.redirect('/data')
     }
 

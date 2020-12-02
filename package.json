@@ -24,6 +24,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "fast-csv": "^4.3.5",
+    "forever": "^3.0.4",
     "hbs": "^4.1.1",
     "http": "0.0.1-security",
     "moment": "^2.29.1",
