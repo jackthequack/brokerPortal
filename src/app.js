@@ -294,7 +294,7 @@ app.get('/performance', isLoggedIn, (req,res) => {
 
 //API to get data and send back to mychart.js
 app.get('/api/data', (req, res) =>{
-
+ if(req.user.account == "R"){
   Realtor.find({username: req.user.username}, (err, realtors, count)=>{
     res.json(realtors.map(function(ele){
       return{
@@ -302,6 +302,16 @@ app.get('/api/data', (req, res) =>{
       };
     }));
     });
+  }
+  else{
+    Broker.find({username: req.user.username}, (err, brokers, count)=>{
+    res.json(brokers.map(function(ele){
+      return{
+	'listings': ele.listings
+      };
+    }));
+    });
+  }
 });
 
 // this gets the form data, gets the realtor by username, and then adds the listing.
@@ -318,16 +328,30 @@ app.post('/listings', (req, res)=> {
     dom: 0
   }
   if(listing.address !== ""){ //make sure listing has an address at least
-
-    Realtor.findOne({username: req.user.username}, (err, real)=>{
-      let listings = real.listings;
-      listings.push(listing);
-      Realtor.updateOne({username: req.user.username}, {$set: {listings: listings}}, function(err, resp) {
-          if(err){console.log(err)}
-          else{console.log("Successful: ", resp.result)}
+    if(req.user.account == "R"){
+   	 Realtor.findOne({username: req.user.username}, (err, real)=>{
+     	 let listings = real.listings;
+     	 listings.push(listing);
+     	 Realtor.updateOne({username: req.user.username}, {$set: {listings: listings}}, function(err, resp) {
+         	 if(err){console.log(err)}
+         	 else{console.log("Successful: ", resp.result)}
     });
     console.log(listings);
     });
+    }
+    else{
+	Broker.findOne({username: req.user.username}, (err, real)=>{
+      console.log(real)
+	let listings = real.listings;
+      listings.push(listing);
+      Broker.updateOne({username: req.user.username}, {$set: {listings: listings}}, function(err, resp){
+          if(err){console.log(err)}
+          else{console.log("Successful: ", resp.result)}
+   	 });
+   	 console.log(listings);
+   	 });
+	}
+ 
 
 
 
@@ -417,8 +441,9 @@ app.get('/messages', isLoggedIn,  (req, res) => {
 
 
 app.post('/salespeople',  (req, res) => {
-
-        let newRealtor = new Realtor({name: req.body.name, username: req.body.username, password: req.body.password, broker: req.user.username})
+	if(req.user.account == "R"){res.redirect('/salespeople')}
+	else{
+       	 let newRealtor = new Realtor({name: req.body.name, username: req.body.username, password: req.body.password, broker: req.user.username})
             newRealtor.save((err, myRealtor) => {
             if(err) {console.log(err)} else{
 	      console.log(myRealtor)
@@ -435,8 +460,10 @@ app.post('/salespeople',  (req, res) => {
             }
 
         });
+	   res.redirect('/salespeople')
 
-    res.redirect('/salespeople')
+	}
+    
 
 })
 app.get("/logout", function (req, res) {
@@ -473,7 +500,7 @@ app.post("/cma", upload.single('csvData'), function(req, res){
       }).then(function(result){
         console.log(result);
         //console.log("stats are"+result);
-	if(req.user.account = "R"){
+	if(req.user.account == "R"){
 
 	        Realtor.updateOne({username: req.user.username}, {$set: {stats: undefined}}, function(err, resp) {
         	    if(err){console.log(err)}
@@ -485,14 +512,20 @@ app.post("/cma", upload.single('csvData'), function(req, res){
            	 })
 	}
 	else{
+		console.log("WORKING!!!")
 		Broker.updateOne({username: req.user.username}, {$set: {stats: undefined}}, function(err, resp) {
-                    if(err){console.log(err)}
+                    
+		    if(err){console.log(err)}
                     else{console.log("Successful! ")}
                  })
                  Broker.updateOne({username: req.user.username}, {$set: {stats: result}}, function(err, resp) {
                          if(err){console.log(err)}
                          else{console.log("Successful! ")}
                  })
+		Broker.findOne({username: req.user.username},  function(err, myBroker) {
+			if(err){console.log(err)}
+			else{console.log(myBroker)}
+		})
 	}
       });
 
@@ -518,8 +551,10 @@ app.get("/cma", isLoggedIn, (req,res)=>{
  	   })
    }
   else{
+	console.log("working")
 	 Broker.findOne({username: req.user.username}, (err, myBroker) => {
-          res.render('cma', {stats: encodeURIComponent(JSON.stringify(myBroker.stats))});
+         	console.log(myBroker)
+		 res.render('cma', {stats: encodeURIComponent(JSON.stringify(myBroker.stats))});
            })
    }
 

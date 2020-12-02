@@ -32,6 +32,7 @@ mongoose.model('Realtor', RealtorSchema);
 const BrokerSchema = new mongoose.Schema({
   name: {type: String},
   brokerage: {type: String},
+  listings: [{address: String, listprice: String, clientName: String, listDate: String, status: String, dom: Number, city: String}],
   salespeople: [RealtorSchema], //note: this subdocument structure doesn't allow to save nested docs individually. Have to save the parent (broker);
   stats: [{low: Number, high: Number, median: Number, average: Number}],
   username: {type: String, required: true},
