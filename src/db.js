@@ -16,6 +16,7 @@ mongoose.model('User', UserSchema);
 const RealtorSchema = new mongoose.Schema({
   name: {type: String},
   username: {type: String, required: true},
+  password: {type: String, required: true},
   listings: [{address: String, listprice: String, clientName: String, listDate: String, status: String, dom: Number, city: String}], //will be added to
   data: [{lat: Number, long: Number}],
   stats: [{low: Number, high: Number, median: Number, average: Number}],
@@ -31,7 +32,7 @@ mongoose.model('Realtor', RealtorSchema);
 const BrokerSchema = new mongoose.Schema({
   name: {type: String},
   brokerage: {type: String},
-  salespeople: [UserSchema], //note: this subdocument structure doesn't allow to save nested docs individually. Have to save the parent (broker);
+  salespeople: [RealtorSchema], //note: this subdocument structure doesn't allow to save nested docs individually. Have to save the parent (broker);
   username: {type: String, required: true},
   data: [{lat: Number, long: Number}],
   reqID: String     //similar to homework we can use this to manage cookies
@@ -65,8 +66,9 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
 } else {
  // if we're not in PRODUCTION mode, then use
  dbconf = 'mongodb://localhost/portal';
+ console.log(dbconf)
 }
-//console.log(dbconf)
+console.log(dbconf)
 mongoose.connect(dbconf);
 
 

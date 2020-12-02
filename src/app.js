@@ -58,9 +58,8 @@ let sessionMiddleware = session({
   secret: "Secret",
   resave: false,
   saveUninitialized: false,
-  store: new (require("connect-mongo")(session))({
-    url: "mongodb://localhost/portal"
-})
+ // store: new (require("connect-mongo")(session))({
+   // url: "mongodb://localhost/portal"})
 })
 app.use(sessionMiddleware);
 
@@ -175,14 +174,16 @@ app.post("/register", function (req, res) {
         passport.authenticate("local")(
             req, res, function () {
             if(accountType == "R"){
-              let newRealtor = new Realtor({name: name, username: username,  brokerage: brokerage})
+              let newRealtor = new Realtor({name: name, username: username, password: password, brokerage: brokerage})
               newRealtor.save((err, myRealtor) => {
                   if(err) {console.log(err)} else{console.log(myRealtor.name, " SUCCESSFULLY ADDED")}
               });
             }
             else{
+	      console.log("if working")
               let newBroker = new Broker({name: name, username: username, brokerage: brokerage})
               newBroker.save((err, newBroker) => {
+		  console.log("newBroker working", newBroker)
                   if(err) {console.log(err)} else{console.log(newBroker.name, " SUCCESSFULLY ADDED")}
               });
             }
@@ -244,8 +245,12 @@ app.get('/',  connectEnsureLogin.ensureLoggedIn(), (req, res) => {
 // broker's salespeople
 app.get('/salespeople', isLoggedIn, (req, res) => {
         console.log("QUERY: ", req.query)
-        Broker.find({username: req.user.username}, (err, myBrokers) => {
+        Broker.findOne({username: req.user.username}, (err, myBrokers) => {
             //let name = myBrokers[0].firstName + " " + myBrokers[0].lastName;
+	    if(myBrokers==null){
+		res.render('salesPeople');}
+	    else{
+	
             let queryName = req.query.name;
             let queryListings = req.query.listings;
             let queryUsername = req.query.username;
@@ -266,15 +271,16 @@ app.get('/salespeople', isLoggedIn, (req, res) => {
                             else{false;}
                         })
                         console.log("FILTERED REALTORS: ", filteredRealtors)
-                        for(let j = 0; j < filteredRealtors.length; j++){
-                            myBrokers.salespeople.push(filteredRealtors[j]);
-                        }
+                       // for(let j = 0; j < filteredRealtors.length; j++){
+                         //   myBrokers.salespeople.push(filteredRealtors[j]);
+                       // }
                   //  })
 
 
                 // console.log("BROKER: ", myBrokers[0])
-                res.render('salesPeople', {salespeople: myBrokers.salespeople});
+                res.render('salesPeople', {salespeople: filteredRealtors});
           }
+	 }
         })
 
 
@@ -334,6 +340,7 @@ else{
 
 // display listings here
 app.get('/listings', isLoggedIn, (req, res) => {
+    console.log(req.user.username)
     let type = req.user.account;
     if(type=="R"){
       Realtor.findOne({username: req.user.username}, (err, myRealtor)=>{
@@ -394,12 +401,19 @@ app.get('/messages', isLoggedIn,  (req, res) => {
 
 app.post('/salespeople',  (req, res) => {
 
-        let newRealtor = new Realtor({name: req.body.name, username: req.body.username, broker: req.user.username})
+        let newRealtor = new Realtor({name: req.body.name, username: req.body.username, password: req.body.password, broker: req.user.username})
             newRealtor.save((err, myRealtor) => {
             if(err) {console.log(err)} else{
+	      console.log(myRealtor)
+	      console.log(req.user.username)
               console.log(myRealtor.name, " SUCCESSFULLY ADDED")
               Broker.findOne({username: req.user.username}, (err, newB)=>{
+		console.log(newB)
                 newB.salespeople.push(myRealtor);
+		console.log(newB)
+		Broker.updateOne({username: newB.username}, {salespeople: newB.salespeople}, function(err, result) {
+		if(err){console.log(err)} else{console.log(result)}
+		})
               });
             }
 
